@@ -3,6 +3,7 @@ package ru.epserv.util.proxycheck.v3.api.model.common
 import com.mojang.datafixers.util.Either
 import com.mojang.serialization.Codec
 import com.mojang.serialization.DataResult
+import org.jetbrains.annotations.ApiStatus
 import ru.epserv.util.proxycheck.v3.api.util.IpUtil
 import ru.epserv.util.proxycheck.v3.api.util.IpUtil.isValidNetMaskBits
 import ru.epserv.util.proxycheck.v3.api.util.IpUtil.sizeBits
@@ -101,10 +102,32 @@ data class CidrIpRange(
     override fun toString(): String = "${address.hostAddress}/$netMaskBits"
 
     companion object {
+        /**
+         * All IPv4 addresses (`0.0.0.0/0`).
+         *
+         * @since 1.0.0
+         * @author metabrix
+         */
+        @ApiStatus.AvailableSince("1.0.0")
         val ANY_V4 = CidrIpRange(IpUtil.ANY_V4, 0)
 
+        /**
+         * All IPv6 addresses (`::/0`).
+         *
+         * @since 1.0.0
+         * @author metabrix
+         */
+        @ApiStatus.AvailableSince("1.0.0")
         val ANY_V6 = CidrIpRange(IpUtil.ANY_V6, 0)
 
+        /**
+         * A codec for [CidrIpRange] that encodes/decodes the full CIDR notation that includes
+         * both the address and the netmask bits (e.g., `198.51.100.0/24` or `2001:db8::/32`).
+         *
+         * @since 1.0.0
+         * @author metabrix
+         */
+        @ApiStatus.AvailableSince("1.0.0")
         val STRING_CODEC_FULL: Codec<CidrIpRange> = Codec.STRING.comapFlatMap(
             { string ->
                 val parts = string.split("/")
@@ -138,6 +161,15 @@ data class CidrIpRange(
             CidrIpRange::toString,
         )
 
+        /**
+         * A codec for [CidrIpRange] that accepts either a plain IP address (e.g., `198.51.100.84`
+         * or `2001:db8::1`) that maps to a single-address CIDR range, or a full CIDR notation that
+         * includes both the address and the netmask bits (e.g., `198.51.100.0/24` or `2001:db8::/32`).
+         *
+         * @since 1.0.0
+         * @author metabrix
+         */
+        @ApiStatus.AvailableSince("1.0.0")
         val STRING_CODEC: Codec<CidrIpRange> = Codec.either(Codecs.INET_ADDRESS_STRING, STRING_CODEC_FULL).xmap(
             { either -> either.map({ address -> CidrIpRange(address) }, { range -> range }) },
             { range -> Either.right(range) },

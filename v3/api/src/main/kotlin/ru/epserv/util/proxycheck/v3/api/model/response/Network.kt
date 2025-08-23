@@ -1,10 +1,24 @@
 package ru.epserv.util.proxycheck.v3.api.model.response
 
 import com.mojang.serialization.Codec
+import org.jetbrains.annotations.ApiStatus
 import ru.epserv.util.proxycheck.v3.api.model.common.CidrIpRange
 import ru.epserv.util.proxycheck.v3.api.util.codec.Codecs
 import ru.epserv.util.proxycheck.v3.api.util.mapCodec
 
+/**
+ * Network information.
+ *
+ * @property asn autonomous system number
+ * @property range IP range in CIDR notation
+ * @property hostName host name
+ * @property provider network provider
+ * @property organisation organisation name
+ * @property type network type
+ * @since 1.0.0
+ * @author metabrix
+ */
+@ApiStatus.AvailableSince("1.0.0")
 data class Network(
     val asn: Int,
     val range: CidrIpRange,
@@ -14,7 +28,8 @@ data class Network(
     val type: String,
 ) {
     companion object {
-        val CODEC = mapCodec { instance ->
+        @ApiStatus.Internal
+        internal val CODEC = mapCodec { instance ->
             instance.group(
                 Codecs.ASN_STRING.fieldOf("asn").forGetter(Network::asn),
                 CidrIpRange.STRING_CODEC.fieldOf("range").forGetter(Network::range),

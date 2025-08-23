@@ -2,7 +2,19 @@ package ru.epserv.util.proxycheck.v3.api.model.response
 
 import com.mojang.serialization.Codec
 import com.mojang.serialization.DataResult
+import org.jetbrains.annotations.ApiStatus
 
+/**
+ * Response status.
+ *
+ * @property value string representation of the status
+ * @property isSuccessful whether the status indicates a successful response,
+ *           meaning the response contains results
+ * @property hasMessage whether the status includes a message, i.e., a warning or an error explanation
+ * @since 1.0.0
+ * @author metabrix
+ */
+@ApiStatus.AvailableSince("1.0.0")
 enum class ResponseStatus(
     val value: String,
     val isSuccessful: Boolean,
@@ -17,7 +29,8 @@ enum class ResponseStatus(
     companion object {
         private val index = entries.associateBy { it.value }
 
-        val CODEC: Codec<ResponseStatus> = Codec.STRING.comapFlatMap(
+        @ApiStatus.Internal
+        internal val CODEC: Codec<ResponseStatus> = Codec.STRING.comapFlatMap(
             { value -> index[value]?.let { DataResult.success(it) } ?: DataResult.error { "Unknown response status: $value" } },
             ResponseStatus::value,
         )

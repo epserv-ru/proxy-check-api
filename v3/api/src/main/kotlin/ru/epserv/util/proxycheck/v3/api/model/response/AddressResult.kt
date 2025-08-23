@@ -1,18 +1,32 @@
 package ru.epserv.util.proxycheck.v3.api.model.response
 
 import com.mojang.serialization.Codec
+import org.jetbrains.annotations.ApiStatus
 import ru.epserv.util.proxycheck.v3.api.util.codec.Codecs
 import ru.epserv.util.proxycheck.v3.api.util.codec.Codecs.associatedWith
 import ru.epserv.util.proxycheck.v3.api.util.codec.Codecs.forNullableGetter
 import ru.epserv.util.proxycheck.v3.api.util.mapCodec
 import java.util.Optional
 
+/**
+ * Results for a single IP address.
+ *
+ * @property network network information
+ * @property location location information
+ * @property deviceEstimate device number estimate
+ * @property detections detections
+ * @property operator operator information (may be null)
+ * @property queryTime time taken to process the query in milliseconds, excluding network RTT
+ * @since 1.0.0
+ * @author metabrix
+ */
+@ApiStatus.AvailableSince("1.0.0")
 data class AddressResult(
     val network: Network,
     val location: Location,
     val deviceEstimate: DeviceEstimate,
     val detections: Detections,
-    val operator: Operator,
+    val operator: Operator?,
     val queryTime: Long,
 ) {
     constructor(
@@ -32,7 +46,8 @@ data class AddressResult(
     )
 
     companion object {
-        val CODEC = mapCodec { instance ->
+        @ApiStatus.Internal
+        internal val CODEC = mapCodec { instance ->
             instance.group(
                 Network.CODEC.fieldOf("network").forGetter(AddressResult::network),
                 Location.CODEC.fieldOf("location").forGetter(AddressResult::location),
@@ -43,6 +58,7 @@ data class AddressResult(
             ).apply(instance, ::AddressResult)
         }
 
-        val MULTIPLE_MAP_CODEC = Codecs.INET_ADDRESS_STRING.associatedWith(CODEC)
+        @ApiStatus.Internal
+        internal val MULTIPLE_MAP_CODEC = Codecs.INET_ADDRESS_STRING.associatedWith(CODEC)
     }
 }

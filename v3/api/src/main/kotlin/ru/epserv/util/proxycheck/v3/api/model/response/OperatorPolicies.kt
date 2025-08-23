@@ -1,11 +1,27 @@
 package ru.epserv.util.proxycheck.v3.api.model.response
 
 import com.mojang.serialization.Codec
+import org.jetbrains.annotations.ApiStatus
 import ru.epserv.util.proxycheck.v3.api.util.codec.Codecs.forNullableGetter
 import ru.epserv.util.proxycheck.v3.api.util.mapCodec
 import java.util.*
 import kotlin.jvm.optionals.getOrNull
 
+/**
+ * VPN/proxy operator policies.
+ *
+ * @property adFiltering whether the operator provides ad filtering
+ * @property freeAccess whether the operator provides free access
+ * @property paidAccess whether the operator provides paid access
+ * @property portForwarding whether the operator provides port forwarding
+ * @property logging whether the operator retains logs
+ * @property anonymousPayments whether the operator accepts anonymous payments
+ * @property cryptoPayments whether the operator accepts cryptocurrency payments
+ * @property traceableOwnership whether the operator has traceable ownership
+ * @since 1.0.0
+ * @author metabrix
+ */
+@ApiStatus.AvailableSince("1.0.0")
 data class OperatorPolicies(
     val adFiltering: Boolean?,
     val freeAccess: Boolean?,
@@ -37,7 +53,8 @@ data class OperatorPolicies(
     )
 
     companion object {
-        val CODEC = mapCodec { instance ->
+        @ApiStatus.Internal
+        internal val CODEC = mapCodec { instance ->
             instance.group(
                 Codec.BOOL.optionalFieldOf("ad_filtering").forNullableGetter(OperatorPolicies::adFiltering),
                 Codec.BOOL.optionalFieldOf("free_access").forNullableGetter(OperatorPolicies::freeAccess),
