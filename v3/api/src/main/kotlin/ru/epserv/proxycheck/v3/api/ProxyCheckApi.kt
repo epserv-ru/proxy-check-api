@@ -37,7 +37,7 @@ interface ProxyCheckApi : AutoCloseable {
     @ApiStatus.AvailableSince("1.0.0")
     fun check(
         addresses: Sequence<InetAddress>,
-        configure: RequestConfiguration.() -> Unit,
+        configure: RequestConfiguration.() -> Unit = {},
     ): Response = this.checkAsync(addresses, configure).join()
 
     /**
@@ -52,7 +52,7 @@ interface ProxyCheckApi : AutoCloseable {
     @ApiStatus.AvailableSince("1.0.0")
     fun check(
         addresses: Iterable<InetAddress>,
-        configure: RequestConfiguration.() -> Unit,
+        configure: RequestConfiguration.() -> Unit = {},
     ): Response = this.check(addresses.asSequence(), configure)
 
     /**
@@ -67,7 +67,7 @@ interface ProxyCheckApi : AutoCloseable {
     @ApiStatus.AvailableSince("1.0.0")
     fun check(
         vararg addresses: InetAddress,
-        configure: RequestConfiguration.() -> Unit,
+        configure: RequestConfiguration.() -> Unit = {},
     ): Response = this.check(addresses.asSequence(), configure)
 
     /**
@@ -82,7 +82,7 @@ interface ProxyCheckApi : AutoCloseable {
     @ApiStatus.AvailableSince("1.0.0")
     fun checkAsync(
         addresses: Sequence<InetAddress>,
-        configure: RequestConfiguration.() -> Unit,
+        configure: RequestConfiguration.() -> Unit = {},
     ): CompletableFuture<Response>
 
     /**
@@ -97,7 +97,7 @@ interface ProxyCheckApi : AutoCloseable {
     @ApiStatus.AvailableSince("1.0.0")
     fun checkAsync(
         addresses: Iterable<InetAddress>,
-        configure: RequestConfiguration.() -> Unit,
+        configure: RequestConfiguration.() -> Unit = {},
     ): CompletableFuture<Response> = this.checkAsync(addresses.asSequence(), configure)
 
     /**
@@ -112,7 +112,7 @@ interface ProxyCheckApi : AutoCloseable {
     @ApiStatus.AvailableSince("1.0.0")
     fun checkAsync(
         vararg addresses: InetAddress,
-        configure: RequestConfiguration.() -> Unit,
+        configure: RequestConfiguration.() -> Unit = {},
     ): CompletableFuture<Response> = this.checkAsync(addresses.asSequence(), configure)
 
     /**
@@ -127,7 +127,7 @@ interface ProxyCheckApi : AutoCloseable {
     @ApiStatus.AvailableSince("1.0.0")
     suspend fun checkSuspend(
         addresses: Sequence<InetAddress>,
-        configure: RequestConfiguration.() -> Unit,
+        configure: RequestConfiguration.() -> Unit = {},
     ): Response = this.checkAsync(addresses, configure).await()
 
     /**
@@ -142,7 +142,7 @@ interface ProxyCheckApi : AutoCloseable {
     @ApiStatus.AvailableSince("1.0.0")
     suspend fun checkSuspend(
         addresses: Iterable<InetAddress>,
-        configure: RequestConfiguration.() -> Unit,
+        configure: RequestConfiguration.() -> Unit = {},
     ): Response = this.checkSuspend(addresses.asSequence(), configure)
 
     /**
@@ -157,6 +157,6 @@ interface ProxyCheckApi : AutoCloseable {
     @ApiStatus.AvailableSince("1.0.0")
     suspend fun checkSuspend(
         vararg addresses: InetAddress,
-        configure: RequestConfiguration.() -> Unit,
+        configure: RequestConfiguration.() -> Unit = {},
     ): Response = this.checkSuspend(addresses.asSequence(), configure)
 }
