@@ -40,7 +40,7 @@ tasks.jar {
             "Implementation-Version" to project.version,
             "Implementation-Vendor" to "ElectroPlay Development Team",
             "Specification-Title" to "proxycheck.io",
-            "Specification-Version" to "v2",
+            "Specification-Version" to "v3",
             "Specification-Vendor" to "https://proxycheck.io/api/",
             "Git-Branch" to gitBranch,
             "Git-Commit" to gitCommit,
