@@ -3,7 +3,7 @@ package ru.epserv.proxycheck.v3.api.model.response
 import com.mojang.serialization.Codec
 import org.jetbrains.annotations.ApiStatus
 import org.jetbrains.annotations.Range
-import ru.epserv.proxycheck.v3.api.util.mapCodec
+import ru.epserv.proxycheck.v3.api.util.buildMapCodec
 
 /**
  * Detections information.
@@ -32,7 +32,7 @@ data class Detections(
 ) {
     companion object {
         @ApiStatus.Internal
-        internal val CODEC = mapCodec { instance ->
+        internal val CODEC = buildMapCodec { instance ->
             instance.group(
                 Codec.BOOL.fieldOf("proxy").forGetter(Detections::proxy),
                 Codec.BOOL.fieldOf("vpn").forGetter(Detections::vpn),

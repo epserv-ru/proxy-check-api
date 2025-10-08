@@ -1,11 +1,14 @@
 package ru.epserv.proxycheck.v3.api.model.response
 
 import com.mojang.datafixers.util.Either
+import com.mojang.datafixers.util.Pair
 import com.mojang.serialization.Codec
+import com.mojang.serialization.DataResult
+import com.mojang.serialization.DynamicOps
 import org.jetbrains.annotations.ApiStatus
 import ru.epserv.proxycheck.v3.api.model.request.RequestConfiguration
+import ru.epserv.proxycheck.v3.api.util.*
 import ru.epserv.proxycheck.v3.api.util.codec.Codecs.forNullableGetter
-import ru.epserv.proxycheck.v3.api.util.mapCodec
 import java.net.InetAddress
 import java.util.*
 import kotlin.jvm.optionals.getOrNull
@@ -88,14 +91,53 @@ sealed interface Response {
 
         companion object {
             @ApiStatus.Internal
-            internal val CODEC = mapCodec { instance ->
+            internal val METADATA_MAP_CODEC = mapCodec { instance ->
                 instance.group(
                     ResponseStatus.CODEC.fieldOf("status").forGetter(Success::status),
-                    AddressResult.MULTIPLE_MAP_CODEC.forGetter(Success::results),
                     Codec.STRING.optionalFieldOf("message").forNullableGetter(Success::message),
                     Codec.STRING.optionalFieldOf("node").forNullableGetter(Success::node),
                     Codec.LONG.optionalFieldOf("query_time").forNullableGetter(Success::queryTime),
-                ).apply(instance, ::Success)
+                ).apply(instance) { status, message, node, queryTime ->
+                    Success(
+                        status = status,
+                        results = emptyMap(),
+                        message = message,
+                        node = node,
+                        queryTime = queryTime,
+                    )
+                }
+            }
+
+            @ApiStatus.Internal
+            internal val METADATA_CODEC = METADATA_MAP_CODEC.toCodec()
+
+            @ApiStatus.Internal
+            internal val CODEC = SuccessCodec
+
+            internal object SuccessCodec : Codec<Success> {
+                override fun <T : Any> encode(
+                    input: Success,
+                    ops: DynamicOps<T>,
+                    prefix: T,
+                ): DataResult<T> {
+                    val metadataResult = METADATA_CODEC.encode(input, ops, prefix)
+                    return AddressResult.IP_STRING_TO_RESULT_CODEC.encode(input.results, ops, metadataResult.orThrow)
+                }
+
+                override fun <T : Any> decode(
+                    ops: DynamicOps<T>,
+                    input: T,
+                ): DataResult<Pair<Success, T>> {
+                    val metadataResult = METADATA_CODEC.decode(ops, input)
+                    val nonMetadataKeys = METADATA_MAP_CODEC.keys(ops).toList()
+
+                    return ops.getMap(input)
+                        .map { mapLike -> ops.createMap(mapLike.entries().filter { (key, _) -> key !in nonMetadataKeys }) }
+                        .flatMap { remainingEntries -> AddressResult.IP_STRING_TO_RESULT_CODEC.decode(ops, remainingEntries) }
+                        .map { (results, _) -> results }
+                        .flatMap { results -> metadataResult.map { (metadata, _) -> metadata.copy(results = results) } }
+                        .map { metadata -> Pair.of(metadata, input) }
+                }
             }
         }
     }
@@ -128,7 +170,7 @@ sealed interface Response {
 
         companion object {
             @ApiStatus.Internal
-            internal val CODEC = mapCodec { instance ->
+            internal val CODEC = buildMapCodec { instance ->
                 instance.group(
                     ResponseStatus.CODEC.fieldOf("status").forGetter(Failure::status),
                     Codec.STRING.optionalFieldOf("message").forNullableGetter(Failure::message),

@@ -2,7 +2,7 @@ package ru.epserv.proxycheck.v3.api.model.response
 
 import com.mojang.serialization.Codec
 import org.jetbrains.annotations.ApiStatus
-import ru.epserv.proxycheck.v3.api.util.mapCodec
+import ru.epserv.proxycheck.v3.api.util.buildMapCodec
 
 /**
  * Currency information.
@@ -21,7 +21,7 @@ data class Currency(
 ) {
     companion object {
         @ApiStatus.Internal
-        internal val CODEC = mapCodec { instance ->
+        internal val CODEC = buildMapCodec { instance ->
             instance.group(
                 Codec.STRING.fieldOf("code").forGetter(Currency::code),
                 Codec.STRING.fieldOf("name").forGetter(Currency::name),

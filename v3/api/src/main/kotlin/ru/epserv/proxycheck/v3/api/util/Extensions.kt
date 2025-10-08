@@ -3,6 +3,7 @@ package ru.epserv.proxycheck.v3.api.util
 import com.mojang.datafixers.kinds.App
 import com.mojang.datafixers.util.Pair
 import com.mojang.serialization.Codec
+import com.mojang.serialization.MapCodec
 import com.mojang.serialization.codecs.RecordCodecBuilder
 import java.net.URLEncoder
 
@@ -18,9 +19,15 @@ internal operator fun <A, B> Pair<A, B>.component1(): A = this.first
 
 internal operator fun <A, B> Pair<A, B>.component2(): B = this.second
 
-internal fun <T : Any> mapCodec(builder: (RecordCodecBuilder.Instance<T>) -> App<RecordCodecBuilder.Mu<T>, T>): Codec<T> {
-    return RecordCodecBuilder.mapCodec(builder).codec()
+internal fun <T : Any> mapCodec(builder: (RecordCodecBuilder.Instance<T>) -> App<RecordCodecBuilder.Mu<T>, T>): MapCodec<T> {
+    return RecordCodecBuilder.mapCodec(builder)
 }
+
+internal fun <T : Any> buildMapCodec(builder: (RecordCodecBuilder.Instance<T>) -> App<RecordCodecBuilder.Mu<T>, T>): Codec<T> {
+    return mapCodec(builder).codec()
+}
+
+internal fun <T : Any> MapCodec<T>.toCodec(): Codec<T> = this.codec()
 
 internal fun ByteArray.bitsMatch(test: ByteArray, bits: Int): Boolean {
     require(this.size == test.size) { "Byte arrays must be of the same size" }

@@ -2,8 +2,8 @@ package ru.epserv.proxycheck.v3.api.model.response
 
 import com.mojang.serialization.Codec
 import org.jetbrains.annotations.ApiStatus
+import ru.epserv.proxycheck.v3.api.util.buildMapCodec
 import ru.epserv.proxycheck.v3.api.util.codec.Codecs.setOf
-import ru.epserv.proxycheck.v3.api.util.mapCodec
 
 /**
  * VPN/proxy operator information.
@@ -28,7 +28,7 @@ data class Operator(
 ) {
     companion object {
         @ApiStatus.Internal
-        internal val CODEC = mapCodec { instance ->
+        internal val CODEC = buildMapCodec { instance ->
             instance.group(
                 Codec.STRING.fieldOf("name").forGetter(Operator::name),
                 Codec.STRING.fieldOf("url").forGetter(Operator::url),

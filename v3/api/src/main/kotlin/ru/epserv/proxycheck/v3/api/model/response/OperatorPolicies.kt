@@ -2,8 +2,8 @@ package ru.epserv.proxycheck.v3.api.model.response
 
 import com.mojang.serialization.Codec
 import org.jetbrains.annotations.ApiStatus
+import ru.epserv.proxycheck.v3.api.util.buildMapCodec
 import ru.epserv.proxycheck.v3.api.util.codec.Codecs.forNullableGetter
-import ru.epserv.proxycheck.v3.api.util.mapCodec
 import java.util.*
 import kotlin.jvm.optionals.getOrNull
 
@@ -54,7 +54,7 @@ data class OperatorPolicies(
 
     companion object {
         @ApiStatus.Internal
-        internal val CODEC = mapCodec { instance ->
+        internal val CODEC = buildMapCodec { instance ->
             instance.group(
                 Codec.BOOL.optionalFieldOf("ad_filtering").forNullableGetter(OperatorPolicies::adFiltering),
                 Codec.BOOL.optionalFieldOf("free_access").forNullableGetter(OperatorPolicies::freeAccess),
