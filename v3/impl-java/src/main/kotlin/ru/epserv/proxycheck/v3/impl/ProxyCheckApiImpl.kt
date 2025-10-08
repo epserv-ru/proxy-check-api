@@ -64,6 +64,7 @@ class ProxyCheckApiImpl(
 
                 timeout(readTimeout.toJavaDuration())
                 header("User-Agent", versionInfo.httpUserAgent)
+                header("Content-Type", "application/x-www-form-urlencoded")
             }.build(),
             HttpResponse.BodyHandlers.ofString(Charsets.UTF_8),
         )
