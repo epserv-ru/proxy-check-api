@@ -26,6 +26,8 @@ enum class ResponseStatus(
     ERROR(value = "error", isSuccessful = false, hasMessage = true),
     ;
 
+    override fun toString(): String = this.value
+
     companion object {
         private val index = entries.associateBy { it.value }
 
@@ -34,5 +36,19 @@ enum class ResponseStatus(
             { value -> index[value]?.let { DataResult.success(it) } ?: DataResult.error { "Unknown response status: $value" } },
             ResponseStatus::value,
         )
+
+        @ApiStatus.Internal
+        internal val SUCCESSFUL_CODEC: Codec<ResponseStatus> = CODEC.flatXmap(::asDataResultSuccessful, ::asDataResultSuccessful)
+
+        @ApiStatus.Internal
+        internal val NON_SUCCESSFUL_CODEC: Codec<ResponseStatus> = CODEC.flatXmap(::asDataResultNonSuccessful, ::asDataResultNonSuccessful)
+
+        private fun asDataResultSuccessful(status: ResponseStatus): DataResult<ResponseStatus> {
+            return if (status.isSuccessful) DataResult.success(status) else DataResult.error { "Unsuccessful response status: ${status.value}" }
+        }
+
+        private fun asDataResultNonSuccessful(status: ResponseStatus): DataResult<ResponseStatus> {
+            return if (!status.isSuccessful) DataResult.success(status) else DataResult.error { "Successful response status: ${status.value}" }
+        }
     }
 }

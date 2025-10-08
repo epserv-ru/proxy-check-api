@@ -71,8 +71,8 @@ sealed interface Response {
         val queryTime: Long?,
     ) : Response {
         init {
-            require(this.status.isSuccessful) { "Cannot create a successful response with an unsuccessful status: ${this.status}" }
-            require(!this.status.hasMessage || this.message != null) { "Response status ${this.status} requires a message, but none was provided" }
+            require(this.status.isSuccessful) { "Cannot create a successful response with an unsuccessful status: ${this.status.value}" }
+            require(!this.status.hasMessage || this.message != null) { "Response status '${this.status.value}' requires a message, but none was provided" }
         }
 
         private constructor(
@@ -93,7 +93,7 @@ sealed interface Response {
             @ApiStatus.Internal
             internal val METADATA_MAP_CODEC = mapCodec { instance ->
                 instance.group(
-                    ResponseStatus.CODEC.fieldOf("status").forGetter(Success::status),
+                    ResponseStatus.SUCCESSFUL_CODEC.fieldOf("status").forGetter(Success::status),
                     Codec.STRING.optionalFieldOf("message").forNullableGetter(Success::message),
                     Codec.STRING.optionalFieldOf("node").forNullableGetter(Success::node),
                     Codec.LONG.optionalFieldOf("query_time").forNullableGetter(Success::queryTime),
@@ -172,7 +172,7 @@ sealed interface Response {
             @ApiStatus.Internal
             internal val CODEC = buildMapCodec { instance ->
                 instance.group(
-                    ResponseStatus.CODEC.fieldOf("status").forGetter(Failure::status),
+                    ResponseStatus.NON_SUCCESSFUL_CODEC.fieldOf("status").forGetter(Failure::status),
                     Codec.STRING.optionalFieldOf("message").forNullableGetter(Failure::message),
                 ).apply(instance, ::Failure)
             }
