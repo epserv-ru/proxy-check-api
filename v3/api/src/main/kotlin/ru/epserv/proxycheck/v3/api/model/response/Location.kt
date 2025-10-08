@@ -2,7 +2,10 @@ package ru.epserv.proxycheck.v3.api.model.response
 
 import com.mojang.serialization.Codec
 import org.jetbrains.annotations.ApiStatus
+import ru.epserv.proxycheck.v3.api.util.codec.Codecs.forNullableGetter
 import ru.epserv.proxycheck.v3.api.util.mapCodec
+import java.util.*
+import kotlin.jvm.optionals.getOrNull
 
 /**
  * Location information.
@@ -30,13 +33,41 @@ data class Location(
     val countryCode: String,
     val regionName: String,
     val regionCode: String,
-    val cityName: String,
-    val postalCode: String,
+    val cityName: String?,
+    val postalCode: String?,
     val latitude: Double,
     val longitude: Double,
     val timeZone: String,
     val currency: Currency,
 ) {
+    constructor(
+        continentName: String,
+        continentCode: String,
+        countryName: String,
+        countryCode: String,
+        regionName: String,
+        regionCode: String,
+        cityName: String,
+        postalCode: Optional<String>,
+        latitude: Double,
+        longitude: Double,
+        timeZone: String,
+        currency: Currency,
+    ) : this(
+        continentName = continentName,
+        continentCode = continentCode,
+        countryName = countryName,
+        countryCode = countryCode,
+        regionName = regionName,
+        regionCode = regionCode,
+        cityName = cityName,
+        postalCode = postalCode.getOrNull(),
+        latitude = latitude,
+        longitude = longitude,
+        timeZone = timeZone,
+        currency = currency,
+    )
+
     companion object {
         @ApiStatus.Internal
         internal val CODEC = mapCodec { instance ->
@@ -48,7 +79,7 @@ data class Location(
                 Codec.STRING.fieldOf("region_name").forGetter(Location::regionName),
                 Codec.STRING.fieldOf("region_code").forGetter(Location::regionCode),
                 Codec.STRING.fieldOf("city_name").forGetter(Location::cityName),
-                Codec.STRING.fieldOf("postal_code").forGetter(Location::postalCode),
+                Codec.STRING.optionalFieldOf("postal_code").forNullableGetter(Location::postalCode),
                 Codec.DOUBLE.fieldOf("latitude").forGetter(Location::latitude),
                 Codec.DOUBLE.fieldOf("longitude").forGetter(Location::longitude),
                 Codec.STRING.fieldOf("timezone").forGetter(Location::timeZone),

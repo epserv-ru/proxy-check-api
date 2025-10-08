@@ -1,12 +1,14 @@
 package ru.epserv.proxycheck.v3.api.model.response
 
-import com.mojang.serialization.Codec
 import org.jetbrains.annotations.ApiStatus
 import ru.epserv.proxycheck.v3.api.util.codec.Codecs
 import ru.epserv.proxycheck.v3.api.util.codec.Codecs.associatedWith
 import ru.epserv.proxycheck.v3.api.util.codec.Codecs.forNullableGetter
 import ru.epserv.proxycheck.v3.api.util.mapCodec
 import java.util.*
+import kotlin.jvm.optionals.getOrNull
+import kotlin.time.ExperimentalTime
+import kotlin.time.Instant
 
 /**
  * Results for a single IP address.
@@ -16,10 +18,11 @@ import java.util.*
  * @property deviceEstimate device number estimate
  * @property detections detections
  * @property operator operator information (may be null)
- * @property queryTime time taken to process the query in milliseconds, excluding network RTT
+ * @property lastUpdatedAt timestamp of this result's last update
  * @since 1.0.0
  * @author metabrix
  */
+@OptIn(ExperimentalTime::class)
 @ApiStatus.AvailableSince("1.0.0")
 data class AddressResult(
     val network: Network,
@@ -27,7 +30,7 @@ data class AddressResult(
     val deviceEstimate: DeviceEstimate,
     val detections: Detections,
     val operator: Operator?,
-    val queryTime: Long,
+    val lastUpdatedAt: Instant,
 ) {
     constructor(
         network: Network,
@@ -35,14 +38,14 @@ data class AddressResult(
         deviceEstimate: DeviceEstimate,
         detections: Detections,
         operator: Optional<Operator>,
-        queryTime: Long,
+        lastUpdatedAt: Instant,
     ) : this(
         network = network,
         location = location,
         deviceEstimate = deviceEstimate,
         detections = detections,
-        operator = operator.orElse(null),
-        queryTime = queryTime,
+        operator = operator.getOrNull(),
+        lastUpdatedAt = lastUpdatedAt,
     )
 
     companion object {
@@ -54,7 +57,7 @@ data class AddressResult(
                 DeviceEstimate.CODEC.fieldOf("device_estimate").forGetter(AddressResult::deviceEstimate),
                 Detections.CODEC.fieldOf("detections").forGetter(AddressResult::detections),
                 Operator.CODEC.optionalFieldOf("operator").forNullableGetter(AddressResult::operator),
-                Codec.LONG.fieldOf("query_time").forGetter(AddressResult::queryTime),
+                Codecs.INSTANT_EPOCH_SECONDS.fieldOf("last_updated").forGetter(AddressResult::lastUpdatedAt),
             ).apply(instance, ::AddressResult)
         }
 

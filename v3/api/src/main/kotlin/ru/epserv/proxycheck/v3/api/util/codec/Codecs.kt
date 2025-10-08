@@ -6,7 +6,10 @@ import com.mojang.serialization.MapCodec
 import com.mojang.serialization.codecs.RecordCodecBuilder
 import java.net.InetAddress
 import java.util.*
+import kotlin.time.ExperimentalTime
+import kotlin.time.Instant
 
+@OptIn(ExperimentalTime::class)
 internal object Codecs {
     val INET_ADDRESS_STRING: Codec<InetAddress> = Codec.STRING.comapFlatMap(this::decodeInetAddress, InetAddress::getHostAddress)
     val ASN_STRING: Codec<Int> = Codec.STRING.comapFlatMap(
@@ -19,6 +22,8 @@ internal object Codecs {
         },
         { asn -> "AS$asn" },
     )
+
+    val INSTANT_EPOCH_SECONDS: Codec<Instant> = Codec.LONG.xmap(Instant::fromEpochSeconds, Instant::epochSeconds)
 
     fun <O : Any, A : Any> MapCodec<Optional<A>>.forNullableGetter(getter: (O) -> A?): RecordCodecBuilder<O, Optional<A>> {
         return this.forGetter { obj -> Optional.ofNullable(getter(obj)) }

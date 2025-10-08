@@ -14,15 +14,15 @@ import ru.epserv.proxycheck.v3.api.util.mapCodec
  */
 @ApiStatus.AvailableSince("1.0.0")
 data class DeviceEstimate(
-    val address: String,
-    val subnet: String,
+    val address: Long,
+    val subnet: Long,
 ) {
     companion object {
         @ApiStatus.Internal
         internal val CODEC = mapCodec { instance ->
             instance.group(
-                Codec.STRING.fieldOf("address").forGetter(DeviceEstimate::address),
-                Codec.STRING.fieldOf("subnet").forGetter(DeviceEstimate::subnet),
+                Codec.LONG.fieldOf("address").forGetter(DeviceEstimate::address),
+                Codec.LONG.fieldOf("subnet").forGetter(DeviceEstimate::subnet),
             ).apply(instance, ::DeviceEstimate)
         }
     }

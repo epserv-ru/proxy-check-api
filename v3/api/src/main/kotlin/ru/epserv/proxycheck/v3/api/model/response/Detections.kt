@@ -34,13 +34,13 @@ data class Detections(
         @ApiStatus.Internal
         internal val CODEC = mapCodec { instance ->
             instance.group(
-                Codec.BOOL.optionalFieldOf("proxy", false).forGetter(Detections::proxy),
-                Codec.BOOL.optionalFieldOf("vpn", false).forGetter(Detections::vpn),
-                Codec.BOOL.optionalFieldOf("compromised", false).forGetter(Detections::compromised),
-                Codec.BOOL.optionalFieldOf("scraper", false).forGetter(Detections::scraper),
-                Codec.BOOL.optionalFieldOf("tor", false).forGetter(Detections::tor),
-                Codec.BOOL.optionalFieldOf("hosting", false).forGetter(Detections::hosting),
-                Codec.BOOL.optionalFieldOf("anonymous", false).forGetter(Detections::anonymous),
+                Codec.BOOL.fieldOf("proxy").forGetter(Detections::proxy),
+                Codec.BOOL.fieldOf("vpn").forGetter(Detections::vpn),
+                Codec.BOOL.fieldOf("compromised").forGetter(Detections::compromised),
+                Codec.BOOL.fieldOf("scraper").forGetter(Detections::scraper),
+                Codec.BOOL.fieldOf("tor").forGetter(Detections::tor),
+                Codec.BOOL.fieldOf("hosting").forGetter(Detections::hosting),
+                Codec.BOOL.fieldOf("anonymous").forGetter(Detections::anonymous),
                 Codec.intRange(0, 100).optionalFieldOf("risk", 0).forGetter(Detections::risk),
             ).apply(instance, ::Detections)
         }

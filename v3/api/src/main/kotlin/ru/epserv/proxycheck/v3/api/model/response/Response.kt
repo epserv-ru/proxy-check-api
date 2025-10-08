@@ -4,8 +4,11 @@ import com.mojang.datafixers.util.Either
 import com.mojang.serialization.Codec
 import org.jetbrains.annotations.ApiStatus
 import ru.epserv.proxycheck.v3.api.model.request.RequestConfiguration
+import ru.epserv.proxycheck.v3.api.util.codec.Codecs.forNullableGetter
 import ru.epserv.proxycheck.v3.api.util.mapCodec
 import java.net.InetAddress
+import java.util.*
+import kotlin.jvm.optionals.getOrNull
 
 /**
  * proxycheck.io API response.
@@ -52,6 +55,7 @@ sealed interface Response {
      * @property results map of IP addresses to their results
      * @property message optional message (present if [ResponseStatus.hasMessage] is `true`)
      * @property node optional node identifier (present if [RequestConfiguration.returnNode] was set to `true`)
+     * @property queryTime time the server took to process the query in milliseconds, excluding network RTT
      * @since 1.0.0
      * @author metabrix
      */
@@ -61,11 +65,26 @@ sealed interface Response {
         val results: Map<InetAddress, AddressResult>,
         val message: String?,
         val node: String?,
+        val queryTime: Long?,
     ) : Response {
         init {
             require(this.status.isSuccessful) { "Cannot create a successful response with an unsuccessful status: ${this.status}" }
             require(!this.status.hasMessage || this.message != null) { "Response status ${this.status} requires a message, but none was provided" }
         }
+
+        private constructor(
+            status: ResponseStatus,
+            results: Map<InetAddress, AddressResult>,
+            message: Optional<String>,
+            node: Optional<String>,
+            queryTime: Optional<Long>,
+        ) : this(
+            status = status,
+            results = results,
+            message = message.getOrNull(),
+            node = node.getOrNull(),
+            queryTime = queryTime.getOrNull(),
+        )
 
         companion object {
             @ApiStatus.Internal
@@ -73,8 +92,9 @@ sealed interface Response {
                 instance.group(
                     ResponseStatus.CODEC.fieldOf("status").forGetter(Success::status),
                     AddressResult.MULTIPLE_MAP_CODEC.forGetter(Success::results),
-                    Codec.STRING.optionalFieldOf("message", null).forGetter(Success::message),
-                    Codec.STRING.optionalFieldOf("node", null).forGetter(Success::node),
+                    Codec.STRING.optionalFieldOf("message").forNullableGetter(Success::message),
+                    Codec.STRING.optionalFieldOf("node").forNullableGetter(Success::node),
+                    Codec.LONG.optionalFieldOf("query_time").forNullableGetter(Success::queryTime),
                 ).apply(instance, ::Success)
             }
         }
@@ -98,12 +118,20 @@ sealed interface Response {
             require(!this.status.hasMessage || this.message != null) { "Response status ${this.status} requires a message, but none was provided" }
         }
 
+        private constructor(
+            status: ResponseStatus,
+            message: Optional<String>,
+        ) : this(
+            status = status,
+            message = message.getOrNull(),
+        )
+
         companion object {
             @ApiStatus.Internal
             internal val CODEC = mapCodec { instance ->
                 instance.group(
                     ResponseStatus.CODEC.fieldOf("status").forGetter(Failure::status),
-                    Codec.STRING.optionalFieldOf("message", null).forGetter(Failure::message),
+                    Codec.STRING.optionalFieldOf("message").forNullableGetter(Failure::message),
                 ).apply(instance, ::Failure)
             }
         }
