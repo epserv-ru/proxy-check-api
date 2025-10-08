@@ -2,9 +2,9 @@
 
 package ru.epserv.proxycheck.v3.impl
 
+import com.mojang.serialization.Codec
+import com.mojang.serialization.codecs.RecordCodecBuilder
 import ru.epserv.proxycheck.v3.api.util.VersionInfo
-import java.util.jar.Attributes
-import java.util.jar.Manifest
 import kotlin.time.ExperimentalTime
 import kotlin.time.Instant
 
@@ -26,26 +26,23 @@ data class VersionInfoImpl(
 ) : VersionInfo {
     override val httpUserAgent by lazy { "${this.implementationName}/${this.implementationVersion} (+${this.contactWebsite}; <${this.contactEmail}>)" }
 
-    constructor(manifest: Manifest) : this(manifest.mainAttributes)
-
-    constructor(attributes: Attributes) : this(
-        specificationName = attributes.getOrThrow("Specification-Title"),
-        specificationVersion = attributes.getOrThrow("Specification-Version"),
-        specificationVendor = attributes.getOrThrow("Specification-Vendor"),
-
-        implementationName = attributes.getOrThrow("Implementation-Title"),
-        implementationVersion = attributes.getOrThrow("Implementation-Version"),
-        implementationVendor = attributes.getOrThrow("Implementation-Vendor"),
-
-        gitCommit = attributes.getOrThrow("Git-Commit"),
-        gitBranch = attributes.getOrThrow("Git-Branch"),
-        gitTimestamp = Instant.parse(attributes.getOrThrow("Git-Timestamp")),
-
-        contactWebsite = attributes.getOrThrow("Contact-Website"),
-        contactEmail = attributes.getOrThrow("Contact-Email"),
-    )
-
     companion object {
-        private fun Attributes.getOrThrow(name: String): String = requireNotNull(this.getValue(name)) { "Unable to find manifest attribute: $name" }
+        private val TIMESTAMP_CODEC = Codec.STRING.xmap(Instant::parse, Instant::toString)
+
+        internal val CODEC = RecordCodecBuilder.mapCodec {
+            it.group(
+                Codec.STRING.fieldOf("implementation_name").forGetter(VersionInfoImpl::implementationName),
+                Codec.STRING.fieldOf("implementation_version").forGetter(VersionInfoImpl::implementationVersion),
+                Codec.STRING.fieldOf("implementation_vendor").forGetter(VersionInfoImpl::implementationVendor),
+                Codec.STRING.fieldOf("specification_name").forGetter(VersionInfoImpl::specificationName),
+                Codec.STRING.fieldOf("specification_version").forGetter(VersionInfoImpl::specificationVersion),
+                Codec.STRING.fieldOf("specification_vendor").forGetter(VersionInfoImpl::specificationVendor),
+                Codec.STRING.fieldOf("git_branch").forGetter(VersionInfoImpl::gitBranch),
+                Codec.STRING.fieldOf("git_commit").forGetter(VersionInfoImpl::gitCommit),
+                TIMESTAMP_CODEC.fieldOf("git_timestamp").forGetter(VersionInfoImpl::gitTimestamp),
+                Codec.STRING.fieldOf("contact_website").forGetter(VersionInfoImpl::contactWebsite),
+                Codec.STRING.fieldOf("contact_email").forGetter(VersionInfoImpl::contactEmail),
+            ).apply(it, ::VersionInfoImpl)
+        }.codec()
     }
 }

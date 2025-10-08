@@ -17,7 +17,6 @@ import java.net.http.HttpClient
 import java.net.http.HttpRequest
 import java.net.http.HttpResponse
 import java.util.concurrent.CompletableFuture
-import java.util.jar.JarInputStream
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
@@ -39,8 +38,9 @@ class ProxyCheckApiImpl(
     override val versionInfo: VersionInfo
 
     init {
-        val manifest = JarInputStream(this.javaClass.protectionDomain.codeSource.location.openStream()).use { it.manifest }
-        this.versionInfo = VersionInfoImpl(manifest)
+        val stream = checkNotNull(this.javaClass.getResourceAsStream("version_info.json")) { "Unable to find version_info.json resource" }
+        val json = Json.decodeFromString<JsonObject>(stream.use { it.bufferedReader().readText() })
+        this.versionInfo = VersionInfoImpl.CODEC.decode(KJsonOps, json).orThrow.first
     }
 
     override fun checkAsync(
