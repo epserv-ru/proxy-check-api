@@ -82,7 +82,7 @@ class ProxyCheckApiImpl(
                     responseBody = httpResponse.body(),
                 )
 
-                if (rawResponse.statusCode !in 200..299) {
+                if (rawResponse.statusCode !in 200..299 && rawResponse.statusCode != 400) {
                     throw ProxyCheckApiException(
                         rawResponse = rawResponse,
                         message = "Received a non-2xx status code (${rawResponse.statusCode}): ${uri.toMaskedString()}",
@@ -94,7 +94,7 @@ class ProxyCheckApiImpl(
                 } catch (cause: Exception) {
                     throw ProxyCheckApiException(
                         rawResponse = rawResponse,
-                        message = "Failed to parse response body as a JSON object: ${uri.toMaskedString()}",
+                        message = "Failed to parse response body as a JSON object (status code ${rawResponse.statusCode}}): ${uri.toMaskedString()}",
                         cause = cause,
                     )
                 }
