@@ -180,10 +180,12 @@ sealed interface Response {
     }
 
     companion object {
-        @ApiStatus.Internal
-        val CODEC: Codec<Response> = Codec.either(Success.CODEC, Failure.CODEC).xmap(
-            { either -> either.map({ it }, { it }) },
-            { response -> if (response.isSuccessful) Either.left(response as Success) else Either.right(response as Failure) },
-        )
+        @get:ApiStatus.Internal
+        val CODEC: Codec<Response> by lazy {
+            Codec.either(Success.CODEC, Failure.CODEC).xmap(
+                { either -> either.map({ it }, { it }) },
+                { response -> if (response.isSuccessful) Either.left(response as Success) else Either.right(response as Failure) },
+            )
+        }
     }
 }
