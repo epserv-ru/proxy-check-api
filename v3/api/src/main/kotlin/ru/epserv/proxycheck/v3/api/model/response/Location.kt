@@ -4,6 +4,7 @@ import com.mojang.serialization.Codec
 import org.jetbrains.annotations.ApiStatus
 import ru.epserv.proxycheck.v3.api.util.buildMapCodec
 import ru.epserv.proxycheck.v3.api.util.codec.Codecs.forNullableGetter
+import ru.epserv.proxycheck.v3.api.util.codec.Codecs.orNullIf
 import java.util.*
 import kotlin.jvm.optionals.getOrNull
 
@@ -31,13 +32,13 @@ data class Location(
     val continentCode: String,
     val countryName: String,
     val countryCode: String,
-    val regionName: String,
-    val regionCode: String,
+    val regionName: String?,
+    val regionCode: String?,
     val cityName: String?,
     val postalCode: String?,
     val latitude: Double,
     val longitude: Double,
-    val timeZone: String,
+    val timeZone: String?,
     val currency: Currency,
 ) {
     constructor(
@@ -45,26 +46,26 @@ data class Location(
         continentCode: String,
         countryName: String,
         countryCode: String,
-        regionName: String,
-        regionCode: String,
-        cityName: String,
+        regionName: Optional<String>,
+        regionCode: Optional<String>,
+        cityName: Optional<String>,
         postalCode: Optional<String>,
         latitude: Double,
         longitude: Double,
-        timeZone: String,
+        timeZone: Optional<String>,
         currency: Currency,
     ) : this(
         continentName = continentName,
         continentCode = continentCode,
         countryName = countryName,
         countryCode = countryCode,
-        regionName = regionName,
-        regionCode = regionCode,
-        cityName = cityName,
+        regionName = regionName.getOrNull(),
+        regionCode = regionCode.getOrNull(),
+        cityName = cityName.getOrNull(),
         postalCode = postalCode.getOrNull(),
         latitude = latitude,
         longitude = longitude,
-        timeZone = timeZone,
+        timeZone = timeZone.getOrNull(),
         currency = currency,
     )
 
@@ -76,13 +77,13 @@ data class Location(
                 Codec.STRING.fieldOf("continent_code").forGetter(Location::continentCode),
                 Codec.STRING.fieldOf("country_name").forGetter(Location::countryName),
                 Codec.STRING.fieldOf("country_code").forGetter(Location::countryCode),
-                Codec.STRING.fieldOf("region_name").forGetter(Location::regionName),
-                Codec.STRING.fieldOf("region_code").forGetter(Location::regionCode),
-                Codec.STRING.fieldOf("city_name").forGetter(Location::cityName),
-                Codec.STRING.optionalFieldOf("postal_code").forNullableGetter(Location::postalCode),
+                Codec.STRING.fieldOf("region_name").orNullIf("Unknown").forNullableGetter(Location::regionName),
+                Codec.STRING.fieldOf("region_code").orNullIf("Unknown").forNullableGetter(Location::regionCode),
+                Codec.STRING.fieldOf("city_name").orNullIf("Unknown").forNullableGetter(Location::cityName),
+                Codec.STRING.optionalFieldOf("postal_code").orNullIf("Unknown").forNullableGetter(Location::postalCode),
                 Codec.DOUBLE.fieldOf("latitude").forGetter(Location::latitude),
                 Codec.DOUBLE.fieldOf("longitude").forGetter(Location::longitude),
-                Codec.STRING.fieldOf("timezone").forGetter(Location::timeZone),
+                Codec.STRING.fieldOf("timezone").orNullIf("Unknown").forNullableGetter(Location::timeZone),
                 Currency.CODEC.fieldOf("currency").forGetter(Location::currency),
             ).apply(instance, ::Location)
         }

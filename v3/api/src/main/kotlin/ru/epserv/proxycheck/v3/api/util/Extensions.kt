@@ -3,9 +3,17 @@ package ru.epserv.proxycheck.v3.api.util
 import com.mojang.datafixers.kinds.App
 import com.mojang.datafixers.util.Pair
 import com.mojang.serialization.Codec
+import com.mojang.serialization.JavaOps
 import com.mojang.serialization.MapCodec
+import com.mojang.serialization.codecs.OptionalFieldCodec
 import com.mojang.serialization.codecs.RecordCodecBuilder
 import java.net.URLEncoder
+import java.util.*
+import kotlin.reflect.KProperty1
+import kotlin.reflect.full.declaredMemberProperties
+import kotlin.reflect.jvm.isAccessible
+import kotlin.reflect.typeOf
+import kotlin.streams.asSequence
 
 fun String.urlEncode(): String = URLEncoder.encode(this, Charsets.UTF_8)
 
@@ -54,4 +62,29 @@ internal operator fun ByteArray.compareTo(other: ByteArray): Int {
         .map { (a, b) -> a.compareTo(b) }
         .firstOrNull { it != 0 }
         ?: this.size.compareTo(other.size)
+}
+
+internal fun <T, R> Optional<T>.mapOrElse(
+    ifPresent: (T) -> R,
+    ifEmpty: () -> R,
+): R = this.map(ifPresent).orElseGet(ifEmpty)
+
+
+private val optionalFieldCodecNameProperty = fieldNameProperty<OptionalFieldCodec<*>>()
+
+internal val OptionalFieldCodec<*>.name: String
+    get() = optionalFieldCodecNameProperty.get(this)
+
+internal val MapCodec<*>.name: String?
+    get() {
+        if (this is OptionalFieldCodec<*>) return this.name
+        return this.keys(JavaOps.INSTANCE).asSequence().distinct().filterIsInstance<String>().singleOrNull()
+    }
+
+@Suppress("UNCHECKED_CAST")
+private inline fun <reified T : Any> fieldNameProperty(): KProperty1<T, String> {
+    return T::class.declaredMemberProperties
+        .single { it.name == "name" && it.returnType.classifier!! == typeOf<String>().classifier!! }
+        .apply { isAccessible = true }
+        as KProperty1<T, String>
 }

@@ -6,6 +6,7 @@ import ru.epserv.proxycheck.v3.api.model.common.CidrIpRange
 import ru.epserv.proxycheck.v3.api.util.buildMapCodec
 import ru.epserv.proxycheck.v3.api.util.codec.Codecs
 import ru.epserv.proxycheck.v3.api.util.codec.Codecs.forNullableGetter
+import ru.epserv.proxycheck.v3.api.util.codec.Codecs.orNullIf
 import java.util.*
 import kotlin.jvm.optionals.getOrNull
 
@@ -23,26 +24,26 @@ import kotlin.jvm.optionals.getOrNull
  */
 @ApiStatus.AvailableSince("1.0.0")
 data class Network(
-    val asn: Int,
-    val range: CidrIpRange,
+    val asn: Int?,
+    val range: CidrIpRange?,
     val hostName: String?,
-    val provider: String,
-    val organisation: String,
+    val provider: String?,
+    val organisation: String?,
     val type: String,
 ) {
     constructor(
-        asn: Int,
-        range: CidrIpRange,
+        asn: Optional<Int>,
+        range: Optional<CidrIpRange>,
         hostName: Optional<String>,
-        provider: String,
-        organisation: String,
+        provider: Optional<String>,
+        organisation: Optional<String>,
         type: String,
     ) : this(
-        asn = asn,
-        range = range,
+        asn = asn.getOrNull(),
+        range = range.getOrNull(),
         hostName = hostName.getOrNull(),
-        provider = provider,
-        organisation = organisation,
+        provider = provider.getOrNull(),
+        organisation = organisation.getOrNull(),
         type = type,
     )
 
@@ -50,11 +51,11 @@ data class Network(
         @ApiStatus.Internal
         internal val CODEC = buildMapCodec { instance ->
             instance.group(
-                Codecs.ASN_STRING.fieldOf("asn").forGetter(Network::asn),
-                CidrIpRange.STRING_CODEC.fieldOf("range").forGetter(Network::range),
-                Codec.STRING.optionalFieldOf("hostname").forNullableGetter(Network::hostName),
-                Codec.STRING.fieldOf("provider").forGetter(Network::provider),
-                Codec.STRING.fieldOf("organisation").forGetter(Network::organisation),
+                Codecs.ASN_STRING.fieldOf("asn").orNullIf("unknown").forNullableGetter(Network::asn),
+                CidrIpRange.STRING_CODEC.fieldOf("range").orNullIf("unknown").forNullableGetter(Network::range),
+                Codec.STRING.optionalFieldOf("hostname").orNullIf("Unknown").forNullableGetter(Network::hostName),
+                Codec.STRING.fieldOf("provider").orNullIf("Unknown").forNullableGetter(Network::provider),
+                Codec.STRING.fieldOf("organisation").orNullIf("Unknown").forNullableGetter(Network::organisation),
                 Codec.STRING.fieldOf("type").forGetter(Network::type),
             ).apply(instance, ::Network)
         }
