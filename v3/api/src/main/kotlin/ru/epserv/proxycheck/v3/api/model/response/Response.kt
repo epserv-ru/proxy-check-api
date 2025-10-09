@@ -5,10 +5,12 @@ import com.mojang.datafixers.util.Pair
 import com.mojang.serialization.Codec
 import com.mojang.serialization.DataResult
 import com.mojang.serialization.DynamicOps
+import kotlinx.serialization.json.JsonElement
 import org.jetbrains.annotations.ApiStatus
 import ru.epserv.proxycheck.v3.api.model.request.RequestConfiguration
 import ru.epserv.proxycheck.v3.api.util.*
 import ru.epserv.proxycheck.v3.api.util.codec.Codecs.forNullableGetter
+import ru.epserv.proxycheck.v3.api.util.codec.KJsonOps
 import java.net.InetAddress
 import java.util.*
 import kotlin.jvm.optionals.getOrNull
@@ -50,6 +52,16 @@ sealed interface Response {
      */
     @ApiStatus.AvailableSince("1.0.0")
     fun successOrThrow(): Success = this as? Success ?: throw RuntimeException("Received an unsuccessful response with status ${this.status}")
+
+    /**
+     * Encodes the response to [JsonElement].
+     *
+     * @return a JSON value representing this response
+     * @since 1.0.0
+     * @author metabrix
+     */
+    @ApiStatus.AvailableSince("1.0.0")
+    fun toJson(): JsonElement = CODEC.encodeStart(KJsonOps, this).orThrow
 
     /**
      * Successful response.
