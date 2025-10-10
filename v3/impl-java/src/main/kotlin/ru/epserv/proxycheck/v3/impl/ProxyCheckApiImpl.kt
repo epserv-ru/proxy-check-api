@@ -19,17 +19,16 @@ import java.net.http.HttpRequest
 import java.net.http.HttpResponse
 import java.util.concurrent.CompletableFuture
 import kotlin.time.Duration
-import kotlin.time.Duration.Companion.minutes
-import kotlin.time.Duration.Companion.seconds
 import kotlin.time.toJavaDuration
 
 class ProxyCheckApiImpl(
     val apiKey: String?,
-    val apiEndpoint: URI = URI.create("https://proxycheck.io/v3/"),
-    val connectTimeout: Duration = 10.seconds,
-    val readTimeout: Duration = 10.seconds,
-    val shutdownTimeout: Duration = 1.minutes,
-    val proxySelector: ProxySelector = ProxySelector.getDefault(),
+    val apiEndpoint: URI,
+    val connectTimeout: Duration,
+    val readTimeout: Duration,
+    val shutdownTimeout: Duration,
+    val proxySelector: ProxySelector,
+    val apiVersion: String,
 ) : ProxyCheckApi {
     private val httpClient = HttpClient.newBuilder().apply {
         connectTimeout(connectTimeout.toJavaDuration())
@@ -54,7 +53,7 @@ class ProxyCheckApiImpl(
         val requestConfiguration = RequestConfiguration()
         requestConfiguration.configure()
 
-        val rawRequestConfiguration = requestConfiguration.toRaw(this.apiKey)
+        val rawRequestConfiguration = requestConfiguration.toRaw(key = this.apiKey, ver = this.apiVersion)
         val queryString = rawRequestConfiguration.toHttpQueryString().ifEmpty { null }
 
         val uri = if (queryString == null) this.apiEndpoint else this.apiEndpoint.resolve("?$queryString")
@@ -141,6 +140,7 @@ class ProxyCheckApiImpl(
                 readTimeout = configuration.timeout.readTimeout,
                 shutdownTimeout = configuration.timeout.shutdownTimeout,
                 proxySelector = configuration.connection.proxySelector,
+                apiVersion = configuration.unsupported.apiVersion,
             )
         }
 
