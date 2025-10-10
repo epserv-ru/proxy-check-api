@@ -131,8 +131,10 @@ class ProxyCheckApiImpl(
         @ApiStatus.AvailableSince("1.0.0")
         fun build(
             apiKey: String?,
-            configuration: ProxyCheckApiImplConfiguration = ProxyCheckApiImplConfiguration(),
+            configure: ProxyCheckApiImplConfiguration.() -> Unit = {},
         ): ProxyCheckApiImpl {
+            val configuration = ProxyCheckApiImplConfiguration()
+            configuration.configure()
             return ProxyCheckApiImpl(
                 apiKey = apiKey,
                 apiEndpoint = configuration.connection.apiEndpoint,
@@ -142,16 +144,6 @@ class ProxyCheckApiImpl(
                 proxySelector = configuration.connection.proxySelector,
                 apiVersion = configuration.unsupported.apiVersion,
             )
-        }
-
-        @ApiStatus.AvailableSince("1.0.0")
-        fun build(
-            apiKey: String?,
-            configure: ProxyCheckApiImplConfiguration.() -> Unit = {},
-        ): ProxyCheckApiImpl {
-            val configuration = ProxyCheckApiImplConfiguration()
-            configuration.configure()
-            return build(apiKey, configuration)
         }
     }
 }
