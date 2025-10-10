@@ -6,7 +6,6 @@ import ru.epserv.proxycheck.v3.api.model.common.CidrIpRange
 import ru.epserv.proxycheck.v3.api.util.buildMapCodec
 import ru.epserv.proxycheck.v3.api.util.codec.Codecs
 import ru.epserv.proxycheck.v3.api.util.codec.Codecs.forNullableGetter
-import ru.epserv.proxycheck.v3.api.util.codec.Codecs.orNullIf
 import java.util.*
 import kotlin.jvm.optionals.getOrNull
 
@@ -51,11 +50,11 @@ data class Network(
         @ApiStatus.Internal
         internal val CODEC = buildMapCodec { instance ->
             instance.group(
-                Codecs.ASN_STRING.fieldOf("asn").orNullIf("unknown", ignoreCase = true).forNullableGetter(Network::asn),
-                CidrIpRange.STRING_CODEC.fieldOf("range").orNullIf("unknown", ignoreCase = true).forNullableGetter(Network::range),
-                Codec.STRING.optionalFieldOf("hostname").orNullIf("unknown", ignoreCase = true).forNullableGetter(Network::hostName),
-                Codec.STRING.fieldOf("provider").orNullIf("unknown", ignoreCase = true).forNullableGetter(Network::provider),
-                Codec.STRING.fieldOf("organisation").orNullIf("unknown", ignoreCase = true).forNullableGetter(Network::organisation),
+                Codecs.ASN_STRING.optionalFieldOf("asn").forNullableGetter(Network::asn),
+                CidrIpRange.STRING_CODEC.optionalFieldOf("range").forNullableGetter(Network::range),
+                Codec.STRING.optionalFieldOf("hostname").forNullableGetter(Network::hostName),
+                Codec.STRING.optionalFieldOf("provider").forNullableGetter(Network::provider),
+                Codec.STRING.optionalFieldOf("organisation").forNullableGetter(Network::organisation),
                 Codec.STRING.fieldOf("type").forGetter(Network::type),
             ).apply(instance, ::Network)
         }

@@ -57,7 +57,7 @@ data class AddressResult(
                 DeviceEstimate.CODEC.fieldOf("device_estimate").forGetter(AddressResult::deviceEstimate),
                 Detections.CODEC.fieldOf("detections").forGetter(AddressResult::detections),
                 Operator.CODEC.optionalFieldOf("operator").forNullableGetter(AddressResult::operator),
-                Codecs.INSTANT_EPOCH_SECONDS.fieldOf("last_updated").forGetter(AddressResult::lastUpdatedAt),
+                Codecs.INSTANT_ISO_8601.fieldOf("last_updated").forGetter(AddressResult::lastUpdatedAt),
             ).apply(instance, ::AddressResult)
         }
 

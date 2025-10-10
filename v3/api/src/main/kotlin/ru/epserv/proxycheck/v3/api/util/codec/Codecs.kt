@@ -1,12 +1,9 @@
 package ru.epserv.proxycheck.v3.api.util.codec
 
-import com.mojang.datafixers.util.Either
 import com.mojang.serialization.Codec
 import com.mojang.serialization.DataResult
 import com.mojang.serialization.MapCodec
 import com.mojang.serialization.codecs.RecordCodecBuilder
-import ru.epserv.proxycheck.v3.api.util.mapOrElse
-import ru.epserv.proxycheck.v3.api.util.name
 import java.net.InetAddress
 import java.util.*
 import kotlin.time.ExperimentalTime
@@ -15,6 +12,7 @@ import kotlin.time.Instant
 @OptIn(ExperimentalTime::class)
 internal object Codecs {
     val INET_ADDRESS_STRING: Codec<InetAddress> = Codec.STRING.comapFlatMap(this::decodeInetAddress, InetAddress::getHostAddress)
+
     val ASN_STRING: Codec<Int> = Codec.STRING.comapFlatMap(
         { string ->
             try {
@@ -26,7 +24,7 @@ internal object Codecs {
         { asn -> "AS$asn" },
     )
 
-    val INSTANT_EPOCH_SECONDS: Codec<Instant> = Codec.LONG.xmap(Instant::fromEpochSeconds, Instant::epochSeconds)
+    val INSTANT_ISO_8601: Codec<Instant> = Codec.STRING.xmap(Instant::parse, Instant::toString)
 
     fun <O : Any, A : Any> MapCodec<Optional<A>>.forNullableGetter(getter: (O) -> A?): RecordCodecBuilder<O, Optional<A>> {
         return this.forGetter { obj -> Optional.ofNullable(getter(obj)) }
@@ -36,41 +34,6 @@ internal object Codecs {
 
     fun <K : Any, V : Any> Codec<K>.associatedWith(valueCodec: Codec<V>): MapCodec<Map<K, V>> {
         return MapCodec.assumeMapUnsafe(Codec.unboundedMap(this, valueCodec))
-    }
-
-    fun Codec<String>.constant(constantValue: String, ignoreCase: Boolean = false): Codec<String> {
-        fun transform(providedValue: String): DataResult<String> {
-            if (providedValue.equals(constantValue, ignoreCase)) {
-                return DataResult.success(providedValue)
-            }
-            return DataResult.error { "Expected constant value '$constantValue' (ignoreCase = $ignoreCase), but got '$providedValue'" }
-        }
-
-        return this.flatXmap(::transform, ::transform)
-    }
-
-    @JvmName("orNullIfMapCodec")
-    fun <A : Any> MapCodec<A>.orNullIf(nullValue: String, ignoreCase: Boolean = false): MapCodec<Optional<A>> {
-        val fieldName = requireNotNull(this.name) { "MapCodec must have a name to use orNullIf" }
-        return Codec.mapEither(
-            Codec.STRING.constant(nullValue, ignoreCase).optionalFieldOf(fieldName),
-            this,
-        ).xmap(
-            { either -> either.map({ Optional.empty() }, { value -> Optional.of(value) }) },
-            { optional -> optional.mapOrElse({ value -> Either.right(value) }, { Either.left(Optional.empty()) }) },
-        )
-    }
-
-    @JvmName("orNullIfMapCodecOptional")
-    fun <A : Any> MapCodec<Optional<A>>.orNullIf(nullValue: String, ignoreCase: Boolean = false): MapCodec<Optional<A>> {
-        val fieldName = requireNotNull(this.name) { "MapCodec must have a name to use orNullIf" }
-        return Codec.mapEither(
-            Codec.STRING.constant(nullValue, ignoreCase).optionalFieldOf(fieldName),
-            this,
-        ).xmap(
-            { either -> either.map({ Optional.empty() }, { value -> value }) },
-            { optional -> optional.mapOrElse({ value -> Either.right(Optional.of(value)) }, { Either.left(Optional.empty()) }) }
-        )
     }
 
     fun decodeInetAddress(string: String): DataResult<InetAddress> {
