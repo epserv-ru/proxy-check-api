@@ -38,22 +38,22 @@ internal object Codecs {
         return MapCodec.assumeMapUnsafe(Codec.unboundedMap(this, valueCodec))
     }
 
-    fun <A : Any> Codec<A>.constant(constantValue: A): Codec<A> {
-        fun transform(providedValue: A): DataResult<A> {
-            if (providedValue == constantValue) {
+    fun Codec<String>.constant(constantValue: String, ignoreCase: Boolean = false): Codec<String> {
+        fun transform(providedValue: String): DataResult<String> {
+            if (providedValue.equals(constantValue, ignoreCase)) {
                 return DataResult.success(providedValue)
             }
-            return DataResult.error { "Expected constant value '$constantValue', but got '$providedValue'" }
+            return DataResult.error { "Expected constant value '$constantValue' (ignoreCase = $ignoreCase), but got '$providedValue'" }
         }
 
         return this.flatXmap(::transform, ::transform)
     }
 
     @JvmName("orNullIfMapCodec")
-    fun <A : Any> MapCodec<A>.orNullIf(nullValue: String): MapCodec<Optional<A>> {
+    fun <A : Any> MapCodec<A>.orNullIf(nullValue: String, ignoreCase: Boolean = false): MapCodec<Optional<A>> {
         val fieldName = requireNotNull(this.name) { "MapCodec must have a name to use orNullIf" }
         return Codec.mapEither(
-            Codec.STRING.constant(nullValue).optionalFieldOf(fieldName),
+            Codec.STRING.constant(nullValue, ignoreCase).optionalFieldOf(fieldName),
             this,
         ).xmap(
             { either -> either.map({ Optional.empty() }, { value -> Optional.of(value) }) },
@@ -62,10 +62,10 @@ internal object Codecs {
     }
 
     @JvmName("orNullIfMapCodecOptional")
-    fun <A : Any> MapCodec<Optional<A>>.orNullIf(nullValue: String): MapCodec<Optional<A>> {
+    fun <A : Any> MapCodec<Optional<A>>.orNullIf(nullValue: String, ignoreCase: Boolean = false): MapCodec<Optional<A>> {
         val fieldName = requireNotNull(this.name) { "MapCodec must have a name to use orNullIf" }
         return Codec.mapEither(
-            Codec.STRING.constant(nullValue).optionalFieldOf(fieldName),
+            Codec.STRING.constant(nullValue, ignoreCase).optionalFieldOf(fieldName),
             this,
         ).xmap(
             { either -> either.map({ Optional.empty() }, { value -> value }) },

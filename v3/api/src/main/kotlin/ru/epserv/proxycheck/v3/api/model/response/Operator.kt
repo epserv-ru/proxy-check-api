@@ -3,7 +3,11 @@ package ru.epserv.proxycheck.v3.api.model.response
 import com.mojang.serialization.Codec
 import org.jetbrains.annotations.ApiStatus
 import ru.epserv.proxycheck.v3.api.util.buildMapCodec
+import ru.epserv.proxycheck.v3.api.util.codec.Codecs.forNullableGetter
+import ru.epserv.proxycheck.v3.api.util.codec.Codecs.orNullIf
 import ru.epserv.proxycheck.v3.api.util.codec.Codecs.setOf
+import java.util.*
+import kotlin.jvm.optionals.getOrNull
 
 /**
  * VPN/proxy operator information.
@@ -26,14 +30,30 @@ data class Operator(
     val protocols: Set<String>,
     val policies: OperatorPolicies,
 ) {
+    constructor(
+        name: String,
+        url: String,
+        anonymity: Optional<String>,
+        popularity: Optional<String>,
+        protocols: Set<String>,
+        policies: OperatorPolicies,
+    ) : this(
+        name = name,
+        url = url,
+        anonymity = anonymity.getOrNull(),
+        popularity = popularity.getOrNull(),
+        protocols = protocols,
+        policies = policies,
+    )
+
     companion object {
         @ApiStatus.Internal
         internal val CODEC = buildMapCodec { instance ->
             instance.group(
                 Codec.STRING.fieldOf("name").forGetter(Operator::name),
                 Codec.STRING.fieldOf("url").forGetter(Operator::url),
-                Codec.STRING.optionalFieldOf("anonymity", "unknown").forGetter(Operator::anonymity),
-                Codec.STRING.optionalFieldOf("popularity", "unknown").forGetter(Operator::popularity),
+                Codec.STRING.optionalFieldOf("anonymity").orNullIf("unknown", ignoreCase = true).forNullableGetter(Operator::anonymity),
+                Codec.STRING.optionalFieldOf("popularity").orNullIf("unknown", ignoreCase = true).forNullableGetter(Operator::popularity),
                 Codec.STRING.setOf().fieldOf("protocols").forGetter(Operator::protocols),
                 OperatorPolicies.CODEC.optionalFieldOf("policies", OperatorPolicies.UNKNOWN).forGetter(Operator::policies),
             ).apply(instance, ::Operator)

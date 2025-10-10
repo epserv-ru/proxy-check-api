@@ -33,6 +33,24 @@ sealed interface Response {
     val status: ResponseStatus
 
     /**
+     * Response message (if present).
+     *
+     * @since 1.0.0
+     * @author metabrix
+     */
+    @get:ApiStatus.AvailableSince("1.0.0")
+    val message: String?
+
+    /**
+     * API version used for this request (if present).
+     *
+     * @since 1.0.0
+     * @author metabrix
+     */
+    @get:ApiStatus.AvailableSince("1.0.0")
+    val apiVersion: String?
+
+    /**
      * Whether the response is successful ([ResponseStatus.isSuccessful]).
      *
      * @since 1.0.0
@@ -67,8 +85,9 @@ sealed interface Response {
      * Successful response.
      *
      * @property status response status
-     * @property results map of IP addresses to their results
      * @property message optional message (present if [ResponseStatus.hasMessage] is `true`)
+     * @property apiVersion API version used for this request (if present)
+     * @property results map of IP addresses to their results
      * @property node optional node identifier (present if [RequestConfiguration.returnNode] was set to `true`)
      * @property queryTime time the server took to process the query in milliseconds, excluding network RTT
      * @since 1.0.0
@@ -77,8 +96,9 @@ sealed interface Response {
     @ApiStatus.AvailableSince("1.0.0")
     data class Success(
         override val status: ResponseStatus,
+        override val message: String?,
+        override val apiVersion: String?,
         val results: Map<InetAddress, AddressResult>,
-        val message: String?,
         val node: String?,
         val queryTime: Long?,
     ) : Response {
@@ -89,14 +109,16 @@ sealed interface Response {
 
         private constructor(
             status: ResponseStatus,
-            results: Map<InetAddress, AddressResult>,
             message: Optional<String>,
+            apiVersion: Optional<String>,
+            results: Map<InetAddress, AddressResult>,
             node: Optional<String>,
             queryTime: Optional<Long>,
         ) : this(
             status = status,
-            results = results,
             message = message.getOrNull(),
+            apiVersion = apiVersion.getOrNull(),
+            results = results,
             node = node.getOrNull(),
             queryTime = queryTime.getOrNull(),
         )
@@ -109,11 +131,13 @@ sealed interface Response {
                     Codec.STRING.optionalFieldOf("message").forNullableGetter(Success::message),
                     Codec.STRING.optionalFieldOf("node").forNullableGetter(Success::node),
                     Codec.LONG.optionalFieldOf("query_time").forNullableGetter(Success::queryTime),
-                ).apply(instance) { status, message, node, queryTime ->
+                    Codec.STRING.optionalFieldOf("version").forNullableGetter(Success::apiVersion),
+                ).apply(instance) { status, message, node, queryTime, apiVersion ->
                     Success(
                         status = status,
-                        results = emptyMap(),
                         message = message,
+                        apiVersion = apiVersion,
+                        results = emptyMap(),
                         node = node,
                         queryTime = queryTime,
                     )
@@ -141,10 +165,10 @@ sealed interface Response {
                     input: T,
                 ): DataResult<Pair<Success, T>> {
                     val metadataResult = METADATA_CODEC.decode(ops, input)
-                    val nonMetadataKeys = METADATA_MAP_CODEC.keys(ops).toList()
+                    val metadataKeys = METADATA_MAP_CODEC.keys(ops).toList()
 
                     return ops.getMap(input)
-                        .map { mapLike -> ops.createMap(mapLike.entries().filter { (key, _) -> key !in nonMetadataKeys }) }
+                        .map { mapLike -> ops.createMap(mapLike.entries().filter { (key, _) -> key !in metadataKeys }) }
                         .flatMap { remainingEntries -> AddressResult.IP_STRING_TO_RESULT_CODEC.decode(ops, remainingEntries) }
                         .map { (results, _) -> results }
                         .flatMap { results -> metadataResult.map { (metadata, _) -> metadata.copy(results = results) } }
@@ -159,13 +183,15 @@ sealed interface Response {
      *
      * @property status response status
      * @property message optional message (present if [ResponseStatus.hasMessage] is `true`)
+     * @property apiVersion API version used for this request (if present)
      * @since 1.0.0
      * @author metabrix
      */
     @ApiStatus.AvailableSince("1.0.0")
     data class Failure(
         override val status: ResponseStatus,
-        val message: String? = null,
+        override val message: String? = null,
+        override val apiVersion: String? = null,
     ) : Response {
         init {
             require(!this.status.isSuccessful) { "Cannot create an unsuccessful response with a successful status: ${this.status}" }
@@ -175,9 +201,11 @@ sealed interface Response {
         private constructor(
             status: ResponseStatus,
             message: Optional<String>,
+            apiVersion: Optional<String>,
         ) : this(
             status = status,
             message = message.getOrNull(),
+            apiVersion = apiVersion.getOrNull(),
         )
 
         companion object {
@@ -186,6 +214,7 @@ sealed interface Response {
                 instance.group(
                     ResponseStatus.NON_SUCCESSFUL_CODEC.fieldOf("status").forGetter(Failure::status),
                     Codec.STRING.optionalFieldOf("message").forNullableGetter(Failure::message),
+                    Codec.STRING.optionalFieldOf("version").forNullableGetter(Failure::apiVersion),
                 ).apply(instance, ::Failure)
             }
         }

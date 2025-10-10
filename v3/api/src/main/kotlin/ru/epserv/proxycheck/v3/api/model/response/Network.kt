@@ -51,11 +51,11 @@ data class Network(
         @ApiStatus.Internal
         internal val CODEC = buildMapCodec { instance ->
             instance.group(
-                Codecs.ASN_STRING.fieldOf("asn").orNullIf("unknown").forNullableGetter(Network::asn),
-                CidrIpRange.STRING_CODEC.fieldOf("range").orNullIf("unknown").forNullableGetter(Network::range),
-                Codec.STRING.optionalFieldOf("hostname").orNullIf("Unknown").forNullableGetter(Network::hostName),
-                Codec.STRING.fieldOf("provider").orNullIf("Unknown").forNullableGetter(Network::provider),
-                Codec.STRING.fieldOf("organisation").orNullIf("Unknown").forNullableGetter(Network::organisation),
+                Codecs.ASN_STRING.fieldOf("asn").orNullIf("unknown", ignoreCase = true).forNullableGetter(Network::asn),
+                CidrIpRange.STRING_CODEC.fieldOf("range").orNullIf("unknown", ignoreCase = true).forNullableGetter(Network::range),
+                Codec.STRING.optionalFieldOf("hostname").orNullIf("unknown", ignoreCase = true).forNullableGetter(Network::hostName),
+                Codec.STRING.fieldOf("provider").orNullIf("unknown", ignoreCase = true).forNullableGetter(Network::provider),
+                Codec.STRING.fieldOf("organisation").orNullIf("unknown", ignoreCase = true).forNullableGetter(Network::organisation),
                 Codec.STRING.fieldOf("type").forGetter(Network::type),
             ).apply(instance, ::Network)
         }
