@@ -2,6 +2,7 @@ package ru.epserv.proxycheck.v3.impl
 
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
+import org.jetbrains.annotations.ApiStatus
 import ru.epserv.proxycheck.v3.api.ProxyCheckApi
 import ru.epserv.proxycheck.v3.api.ProxyCheckApiException
 import ru.epserv.proxycheck.v3.api.model.request.RequestConfiguration
@@ -125,5 +126,32 @@ class ProxyCheckApiImpl(
         var maskedUri = this@toMaskedString.toString()
         this@ProxyCheckApiImpl.apiKey?.let { maskedUri = maskedUri.replace(it, "<redacted>") }
         return maskedUri
+    }
+
+    companion object {
+        @ApiStatus.AvailableSince("1.0.0")
+        fun build(
+            apiKey: String?,
+            configuration: ProxyCheckApiImplConfiguration = ProxyCheckApiImplConfiguration(),
+        ): ProxyCheckApiImpl {
+            return ProxyCheckApiImpl(
+                apiKey = apiKey,
+                apiEndpoint = configuration.connection.apiEndpoint,
+                connectTimeout = configuration.timeout.connectTimeout,
+                readTimeout = configuration.timeout.readTimeout,
+                shutdownTimeout = configuration.timeout.shutdownTimeout,
+                proxySelector = configuration.connection.proxySelector,
+            )
+        }
+
+        @ApiStatus.AvailableSince("1.0.0")
+        fun build(
+            apiKey: String?,
+            configure: ProxyCheckApiImplConfiguration.() -> Unit = {},
+        ): ProxyCheckApiImpl {
+            val configuration = ProxyCheckApiImplConfiguration()
+            configuration.configure()
+            return build(apiKey, configuration)
+        }
     }
 }
