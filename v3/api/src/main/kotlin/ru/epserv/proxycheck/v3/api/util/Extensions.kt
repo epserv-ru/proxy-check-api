@@ -8,7 +8,6 @@ import com.mojang.serialization.MapCodec
 import com.mojang.serialization.codecs.OptionalFieldCodec
 import com.mojang.serialization.codecs.RecordCodecBuilder
 import java.net.URLEncoder
-import java.util.*
 import kotlin.reflect.KProperty1
 import kotlin.reflect.full.declaredMemberProperties
 import kotlin.reflect.jvm.isAccessible
@@ -63,11 +62,6 @@ internal operator fun ByteArray.compareTo(other: ByteArray): Int {
         .firstOrNull { it != 0 }
         ?: this.size.compareTo(other.size)
 }
-
-internal fun <T, R> Optional<T>.mapOrElse(
-    ifPresent: (T) -> R,
-    ifEmpty: () -> R,
-): R = this.map(ifPresent).orElseGet(ifEmpty)
 
 
 private val optionalFieldCodecNameProperty = fieldNameProperty<OptionalFieldCodec<*>>()

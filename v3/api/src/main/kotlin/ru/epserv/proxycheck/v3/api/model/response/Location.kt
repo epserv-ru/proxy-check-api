@@ -4,7 +4,6 @@ import com.mojang.serialization.Codec
 import org.jetbrains.annotations.ApiStatus
 import ru.epserv.proxycheck.v3.api.util.buildMapCodec
 import ru.epserv.proxycheck.v3.api.util.codec.Codecs.forNullableGetter
-import ru.epserv.proxycheck.v3.api.util.codec.Codecs.orNullIf
 import java.util.*
 import kotlin.jvm.optionals.getOrNull
 
@@ -77,13 +76,13 @@ data class Location(
                 Codec.STRING.fieldOf("continent_code").forGetter(Location::continentCode),
                 Codec.STRING.fieldOf("country_name").forGetter(Location::countryName),
                 Codec.STRING.fieldOf("country_code").forGetter(Location::countryCode),
-                Codec.STRING.fieldOf("region_name").orNullIf("unknown", ignoreCase = true).forNullableGetter(Location::regionName),
-                Codec.STRING.fieldOf("region_code").orNullIf("unknown", ignoreCase = true).forNullableGetter(Location::regionCode),
-                Codec.STRING.fieldOf("city_name").orNullIf("unknown", ignoreCase = true).forNullableGetter(Location::cityName),
-                Codec.STRING.optionalFieldOf("postal_code").orNullIf("unknown", ignoreCase = true).forNullableGetter(Location::postalCode),
+                Codec.STRING.optionalFieldOf("region_name").forNullableGetter(Location::regionName),
+                Codec.STRING.optionalFieldOf("region_code").forNullableGetter(Location::regionCode),
+                Codec.STRING.optionalFieldOf("city_name").forNullableGetter(Location::cityName),
+                Codec.STRING.optionalFieldOf("postal_code").forNullableGetter(Location::postalCode),
                 Codec.DOUBLE.fieldOf("latitude").forGetter(Location::latitude),
                 Codec.DOUBLE.fieldOf("longitude").forGetter(Location::longitude),
-                Codec.STRING.fieldOf("timezone").orNullIf("unknown", ignoreCase = true).forNullableGetter(Location::timeZone),
+                Codec.STRING.optionalFieldOf("timezone").forNullableGetter(Location::timeZone),
                 Currency.CODEC.fieldOf("currency").forGetter(Location::currency),
             ).apply(instance, ::Location)
         }

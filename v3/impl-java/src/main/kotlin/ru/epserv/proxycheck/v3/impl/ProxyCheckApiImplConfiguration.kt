@@ -105,6 +105,6 @@ data class ProxyCheckApiImplConfiguration(
     @ApiStatus.AvailableSince("1.0.0")
     data class UnsupportedConfiguration(
         @ApiStatus.AvailableSince("1.0.0")
-        var apiVersion: String = "12-August-2025",
+        var apiVersion: String = "20-November-2025",
     )
 }

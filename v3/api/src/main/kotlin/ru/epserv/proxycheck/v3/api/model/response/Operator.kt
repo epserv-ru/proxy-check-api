@@ -4,7 +4,6 @@ import com.mojang.serialization.Codec
 import org.jetbrains.annotations.ApiStatus
 import ru.epserv.proxycheck.v3.api.util.buildMapCodec
 import ru.epserv.proxycheck.v3.api.util.codec.Codecs.forNullableGetter
-import ru.epserv.proxycheck.v3.api.util.codec.Codecs.orNullIf
 import ru.epserv.proxycheck.v3.api.util.codec.Codecs.setOf
 import java.util.*
 import kotlin.jvm.optionals.getOrNull
@@ -52,8 +51,8 @@ data class Operator(
             instance.group(
                 Codec.STRING.fieldOf("name").forGetter(Operator::name),
                 Codec.STRING.fieldOf("url").forGetter(Operator::url),
-                Codec.STRING.optionalFieldOf("anonymity").orNullIf("unknown", ignoreCase = true).forNullableGetter(Operator::anonymity),
-                Codec.STRING.optionalFieldOf("popularity").orNullIf("unknown", ignoreCase = true).forNullableGetter(Operator::popularity),
+                Codec.STRING.optionalFieldOf("anonymity").forNullableGetter(Operator::anonymity),
+                Codec.STRING.optionalFieldOf("popularity").forNullableGetter(Operator::popularity),
                 Codec.STRING.setOf().fieldOf("protocols").forGetter(Operator::protocols),
                 OperatorPolicies.CODEC.optionalFieldOf("policies", OperatorPolicies.UNKNOWN).forGetter(Operator::policies),
             ).apply(instance, ::Operator)
