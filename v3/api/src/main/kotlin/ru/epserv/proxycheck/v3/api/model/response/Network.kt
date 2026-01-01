@@ -48,7 +48,7 @@ data class Network(
 
     companion object {
         @ApiStatus.Internal
-        internal val CODEC = buildMapCodec { instance ->
+        val CODEC = buildMapCodec { instance ->
             instance.group(
                 Codecs.ASN_STRING.optionalFieldOf("asn").forNullableGetter(Network::asn),
                 CidrIpRange.STRING_CODEC.optionalFieldOf("range").forNullableGetter(Network::range),

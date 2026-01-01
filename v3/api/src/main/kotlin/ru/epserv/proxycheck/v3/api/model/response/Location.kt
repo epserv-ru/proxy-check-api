@@ -70,7 +70,7 @@ data class Location(
 
     companion object {
         @ApiStatus.Internal
-        internal val CODEC = buildMapCodec { instance ->
+        val CODEC = buildMapCodec { instance ->
             instance.group(
                 Codec.STRING.fieldOf("continent_name").forGetter(Location::continentName),
                 Codec.STRING.fieldOf("continent_code").forGetter(Location::continentCode),

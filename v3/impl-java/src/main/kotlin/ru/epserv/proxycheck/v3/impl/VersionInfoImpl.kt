@@ -29,7 +29,7 @@ data class VersionInfoImpl(
     companion object {
         private val TIMESTAMP_CODEC = Codec.STRING.xmap(Instant::parse, Instant::toString)
 
-        internal val CODEC = RecordCodecBuilder.mapCodec {
+        val CODEC: Codec<VersionInfoImpl> = RecordCodecBuilder.mapCodec {
             it.group(
                 Codec.STRING.fieldOf("implementation_name").forGetter(VersionInfoImpl::implementationName),
                 Codec.STRING.fieldOf("implementation_version").forGetter(VersionInfoImpl::implementationVersion),

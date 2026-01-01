@@ -6,7 +6,7 @@ import org.jetbrains.annotations.Range
 import ru.epserv.proxycheck.v3.api.util.buildMapCodec
 import ru.epserv.proxycheck.v3.api.util.codec.Codecs
 import ru.epserv.proxycheck.v3.api.util.codec.Codecs.forNullableGetter
-import java.util.Optional
+import java.util.*
 import kotlin.jvm.optionals.getOrNull
 import kotlin.time.ExperimentalTime
 import kotlin.time.Instant
@@ -72,7 +72,7 @@ data class Detections(
     )
     companion object {
         @ApiStatus.Internal
-        internal val CODEC = buildMapCodec { instance ->
+        val CODEC = buildMapCodec { instance ->
             instance.group(
                 Codec.BOOL.fieldOf("proxy").forGetter(Detections::proxy),
                 Codec.BOOL.fieldOf("vpn").forGetter(Detections::vpn),

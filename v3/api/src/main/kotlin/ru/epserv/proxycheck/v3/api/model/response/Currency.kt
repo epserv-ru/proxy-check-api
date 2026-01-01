@@ -21,7 +21,7 @@ data class Currency(
 ) {
     companion object {
         @ApiStatus.Internal
-        internal val CODEC = buildMapCodec { instance ->
+        val CODEC = buildMapCodec { instance ->
             instance.group(
                 Codec.STRING.fieldOf("code").forGetter(Currency::code),
                 Codec.STRING.fieldOf("name").forGetter(Currency::name),

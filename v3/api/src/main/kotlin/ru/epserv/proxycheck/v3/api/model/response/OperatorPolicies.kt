@@ -54,7 +54,7 @@ data class OperatorPolicies(
 
     companion object {
         @ApiStatus.Internal
-        internal val CODEC = buildMapCodec { instance ->
+        val CODEC = buildMapCodec { instance ->
             instance.group(
                 Codec.BOOL.optionalFieldOf("ad_filtering").forNullableGetter(OperatorPolicies::adFiltering),
                 Codec.BOOL.optionalFieldOf("free_access").forNullableGetter(OperatorPolicies::freeAccess),

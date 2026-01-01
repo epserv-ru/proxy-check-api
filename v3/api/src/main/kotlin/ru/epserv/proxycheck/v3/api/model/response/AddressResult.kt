@@ -1,10 +1,12 @@
 package ru.epserv.proxycheck.v3.api.model.response
 
+import com.mojang.serialization.Codec
 import org.jetbrains.annotations.ApiStatus
 import ru.epserv.proxycheck.v3.api.util.buildMapCodec
 import ru.epserv.proxycheck.v3.api.util.codec.Codecs
 import ru.epserv.proxycheck.v3.api.util.codec.Codecs.associatedWith
 import ru.epserv.proxycheck.v3.api.util.codec.Codecs.forNullableGetter
+import java.net.InetAddress
 import java.util.*
 import kotlin.jvm.optionals.getOrNull
 import kotlin.time.ExperimentalTime
@@ -50,7 +52,7 @@ data class AddressResult(
 
     companion object {
         @ApiStatus.Internal
-        internal val CODEC = buildMapCodec { instance ->
+        val CODEC = buildMapCodec { instance ->
             instance.group(
                 Network.CODEC.fieldOf("network").forGetter(AddressResult::network),
                 Location.CODEC.fieldOf("location").forGetter(AddressResult::location),
@@ -62,6 +64,6 @@ data class AddressResult(
         }
 
         @ApiStatus.Internal
-        internal val IP_STRING_TO_RESULT_CODEC = Codecs.INET_ADDRESS_STRING.associatedWith(CODEC).codec()
+        val IP_STRING_TO_RESULT_CODEC: Codec<Map<InetAddress, AddressResult>> = Codecs.INET_ADDRESS_STRING.associatedWith(CODEC).codec()
     }
 }

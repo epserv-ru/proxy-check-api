@@ -32,16 +32,16 @@ enum class ResponseStatus(
         private val index = entries.associateBy { it.value }
 
         @ApiStatus.Internal
-        internal val CODEC: Codec<ResponseStatus> = Codec.STRING.comapFlatMap(
+        val CODEC: Codec<ResponseStatus> = Codec.STRING.comapFlatMap(
             { value -> index[value]?.let { DataResult.success(it) } ?: DataResult.error { "Unknown response status: $value" } },
             ResponseStatus::value,
         )
 
         @ApiStatus.Internal
-        internal val SUCCESSFUL_CODEC: Codec<ResponseStatus> = CODEC.flatXmap(::asDataResultSuccessful, ::asDataResultSuccessful)
+        val SUCCESSFUL_CODEC: Codec<ResponseStatus> = CODEC.flatXmap(::asDataResultSuccessful, ::asDataResultSuccessful)
 
         @ApiStatus.Internal
-        internal val NON_SUCCESSFUL_CODEC: Codec<ResponseStatus> = CODEC.flatXmap(::asDataResultNonSuccessful, ::asDataResultNonSuccessful)
+        val NON_SUCCESSFUL_CODEC: Codec<ResponseStatus> = CODEC.flatXmap(::asDataResultNonSuccessful, ::asDataResultNonSuccessful)
 
         private fun asDataResultSuccessful(status: ResponseStatus): DataResult<ResponseStatus> {
             return if (status.isSuccessful) DataResult.success(status) else DataResult.error { "Unsuccessful response status: ${status.value}" }

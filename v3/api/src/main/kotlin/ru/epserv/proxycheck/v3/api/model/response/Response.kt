@@ -125,7 +125,7 @@ sealed interface Response {
 
         companion object {
             @ApiStatus.Internal
-            internal val METADATA_MAP_CODEC = mapCodec { instance ->
+            val METADATA_MAP_CODEC = mapCodec { instance ->
                 instance.group(
                     ResponseStatus.SUCCESSFUL_CODEC.fieldOf("status").forGetter(Success::status),
                     Codec.STRING.optionalFieldOf("message").forNullableGetter(Success::message),
@@ -145,10 +145,10 @@ sealed interface Response {
             }
 
             @ApiStatus.Internal
-            internal val METADATA_CODEC = METADATA_MAP_CODEC.toCodec()
+            val METADATA_CODEC = METADATA_MAP_CODEC.toCodec()
 
             @ApiStatus.Internal
-            internal val CODEC = SuccessCodec
+            val CODEC: Codec<Success> = SuccessCodec
 
             internal object SuccessCodec : Codec<Success> {
                 override fun <T : Any> encode(
@@ -210,7 +210,7 @@ sealed interface Response {
 
         companion object {
             @ApiStatus.Internal
-            internal val CODEC = buildMapCodec { instance ->
+            val CODEC = buildMapCodec { instance ->
                 instance.group(
                     ResponseStatus.NON_SUCCESSFUL_CODEC.fieldOf("status").forGetter(Failure::status),
                     Codec.STRING.optionalFieldOf("message").forNullableGetter(Failure::message),

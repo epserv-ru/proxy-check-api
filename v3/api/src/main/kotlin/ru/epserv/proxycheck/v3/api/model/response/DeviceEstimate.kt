@@ -19,7 +19,7 @@ data class DeviceEstimate(
 ) {
     companion object {
         @ApiStatus.Internal
-        internal val CODEC = buildMapCodec { instance ->
+        val CODEC = buildMapCodec { instance ->
             instance.group(
                 Codec.LONG.fieldOf("address").forGetter(DeviceEstimate::address),
                 Codec.LONG.fieldOf("subnet").forGetter(DeviceEstimate::subnet),

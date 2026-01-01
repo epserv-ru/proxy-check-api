@@ -47,7 +47,7 @@ data class Operator(
 
     companion object {
         @ApiStatus.Internal
-        internal val CODEC = buildMapCodec { instance ->
+        val CODEC = buildMapCodec { instance ->
             instance.group(
                 Codec.STRING.fieldOf("name").forGetter(Operator::name),
                 Codec.STRING.fieldOf("url").forGetter(Operator::url),
