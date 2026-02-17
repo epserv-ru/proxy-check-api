@@ -18,12 +18,14 @@ internal object IpUtil {
         get() = when (this) {
             is Inet4Address -> BYTES_V4
             is Inet6Address -> BYTES_V6
+            is InetAddress -> throw IllegalStateException("Unknown InetAddress subclass: ${this::class.qualifiedName}")
         }
 
     val InetAddress.sizeBits: Int
         get() = when (this) {
             is Inet4Address -> BITS_V4
             is Inet6Address -> BITS_V6
+            is InetAddress -> throw IllegalStateException("Unknown InetAddress subclass: ${this::class.qualifiedName}")
         }
 
     fun InetAddress.isValidNetMaskBits(netMaskBits: Int): Boolean = netMaskBits in 0..this.sizeBits

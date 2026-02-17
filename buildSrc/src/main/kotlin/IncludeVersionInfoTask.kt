@@ -1,5 +1,4 @@
 import io.papermc.paperweight.util.Git
-import io.papermc.paperweight.util.createParentDirectories
 import io.papermc.paperweight.util.path
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.buildJsonObject
@@ -11,6 +10,7 @@ import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
 import org.gradle.kotlin.dsl.property
+import kotlin.io.path.createParentDirectories
 import kotlin.io.path.writeText
 
 abstract class IncludeVersionInfoTask : DefaultTask() {

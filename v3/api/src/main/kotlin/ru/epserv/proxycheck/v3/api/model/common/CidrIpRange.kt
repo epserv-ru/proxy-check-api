@@ -97,6 +97,7 @@ data class CidrIpRange(
         is Inet4Address -> this.address is Inet4Address && addressBytes.bitsMatch(address.address, netMaskBits)
         is Inet6Address -> this.address is Inet6Address && addressBytes.bitsMatch(address.address, netMaskBits)
             && (this.address.scopeId == 0 || this.address.scopeId == address.scopeId)
+        is InetAddress -> throw IllegalStateException("Unknown InetAddress subclass: ${address::class.qualifiedName}")
     }
 
     override fun toString(): String = "${address.hostAddress}/$netMaskBits"

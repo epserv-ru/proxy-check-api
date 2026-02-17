@@ -9,7 +9,6 @@ import ru.epserv.proxycheck.v3.api.util.codec.Codecs.forNullableGetter
 import java.net.InetAddress
 import java.util.*
 import kotlin.jvm.optionals.getOrNull
-import kotlin.time.ExperimentalTime
 import kotlin.time.Instant
 
 /**
@@ -24,7 +23,6 @@ import kotlin.time.Instant
  * @since 1.0.0
  * @author metabrix
  */
-@OptIn(ExperimentalTime::class)
 @ApiStatus.AvailableSince("1.0.0")
 data class AddressResult(
     val network: Network,

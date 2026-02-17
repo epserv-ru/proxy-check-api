@@ -1,9 +1,6 @@
-@file:OptIn(ExperimentalTime::class)
-
 package ru.epserv.proxycheck.v3.api.util
 
 import org.jetbrains.annotations.ApiStatus
-import kotlin.time.ExperimentalTime
 import kotlin.time.Instant
 
 /**

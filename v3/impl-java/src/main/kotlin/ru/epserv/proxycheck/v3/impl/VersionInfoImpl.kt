@@ -1,11 +1,8 @@
-@file:OptIn(ExperimentalTime::class)
-
 package ru.epserv.proxycheck.v3.impl
 
 import com.mojang.serialization.Codec
 import com.mojang.serialization.codecs.RecordCodecBuilder
 import ru.epserv.proxycheck.v3.api.util.VersionInfo
-import kotlin.time.ExperimentalTime
 import kotlin.time.Instant
 
 data class VersionInfoImpl(
