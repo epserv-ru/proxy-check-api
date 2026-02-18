@@ -9,7 +9,7 @@ dependencies {
 }
 
 val includeVersionInfoTask = tasks.register<IncludeVersionInfoTask>("includeVersionInfo") {
-    specificationVersion = "v3"
+    specificationVersion = "v3:11-February-2026"
     outputFile = layout.buildDirectory.file("generated/resources/version_info.json")
 }
 
