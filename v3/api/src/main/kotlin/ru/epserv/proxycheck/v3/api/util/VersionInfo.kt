@@ -1,3 +1,8 @@
+/*
+ * Copyright (c) 2025-2026 ElectroPlay
+ * SPDX-License-Identifier: MPL-2.0
+ */
+
 package ru.epserv.proxycheck.v3.api.util
 
 import org.jetbrains.annotations.ApiStatus

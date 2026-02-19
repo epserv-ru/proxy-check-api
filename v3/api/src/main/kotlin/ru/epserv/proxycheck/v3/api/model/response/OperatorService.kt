@@ -1,3 +1,8 @@
+/*
+ * Copyright (c) 2026 ElectroPlay
+ * SPDX-License-Identifier: MPL-2.0
+ */
+
 package ru.epserv.proxycheck.v3.api.model.response
 
 import com.mojang.serialization.Codec

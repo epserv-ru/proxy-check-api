@@ -1,0 +1,4 @@
+/*
+ * Copyright (c) $YEAR ElectroPlay
+ * SPDX-License-Identifier: MPL-2.0
+ */
