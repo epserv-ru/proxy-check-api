@@ -4,6 +4,7 @@ plugins {
 
 group = providers.gradleProperty("group").get()
 version = providers.gradleProperty("version").get()
+description = providers.gradleProperty("description").get()
 
 repositories {
     maven("https://repo.papermc.io/repository/maven-public/")
