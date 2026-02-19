@@ -31,20 +31,20 @@ import kotlin.jvm.optionals.getOrNull
 data class Operator(
     val name: String,
     val url: String,
-    val anonymity: String?,
-    val popularity: String?,
+    val anonymity: OperatorRating?,
+    val popularity: OperatorRating?,
     val services: Set<OperatorService>?,
-    val protocols: Set<String>,
+    val protocols: Set<OperatorProtocol>,
     val policies: OperatorPolicies,
     val additionalOperators: Set<String>?,
 ) {
     constructor(
         name: String,
         url: String,
-        anonymity: Optional<String>,
-        popularity: Optional<String>,
+        anonymity: Optional<OperatorRating>,
+        popularity: Optional<OperatorRating>,
         services: Optional<Set<OperatorService>>,
-        protocols: Set<String>,
+        protocols: Set<OperatorProtocol>,
         policies: OperatorPolicies,
         additionalOperators: Optional<Set<String>>,
     ) : this(
@@ -64,10 +64,10 @@ data class Operator(
             instance.group(
                 Codec.STRING.fieldOf("name").forGetter(Operator::name),
                 Codec.STRING.fieldOf("url").forGetter(Operator::url),
-                Codec.STRING.optionalFieldOf("anonymity").forNullableGetter(Operator::anonymity),
-                Codec.STRING.optionalFieldOf("popularity").forNullableGetter(Operator::popularity),
+                OperatorRating.CODEC.optionalFieldOf("anonymity").forNullableGetter(Operator::anonymity),
+                OperatorRating.CODEC.optionalFieldOf("popularity").forNullableGetter(Operator::popularity),
                 OperatorService.CODEC.setOf().optionalFieldOf("services").forNullableGetter(Operator::services),
-                Codec.STRING.setOf().fieldOf("protocols").forGetter(Operator::protocols),
+                OperatorProtocol.CODEC.setOf().fieldOf("protocols").forGetter(Operator::protocols),
                 OperatorPolicies.CODEC.optionalFieldOf("policies", OperatorPolicies.UNKNOWN).forGetter(Operator::policies),
                 Codec.STRING.setOf().optionalFieldOf("additional_operators").forNullableGetter(Operator::additionalOperators),
             ).apply(instance, ::Operator)
