@@ -43,7 +43,7 @@ mavenPublishing {
 
         scm {
             url = "https://$repoUrl"
-            connection = "scm:git:ssh://$repoUrl.git"
+            connection = "scm:git:ssh://git@$repoUrl.git"
             developerConnection = connection
         }
     }
