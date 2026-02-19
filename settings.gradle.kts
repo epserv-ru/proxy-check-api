@@ -1,3 +1,8 @@
+/*
+ * Copyright (c) 2025-2026 ElectroPlay
+ * SPDX-License-Identifier: MPL-2.0
+ */
+
 plugins {
     id("org.gradle.toolchains.foojay-resolver-convention") version "1.0.0"
 }
