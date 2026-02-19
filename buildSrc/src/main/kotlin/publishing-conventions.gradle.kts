@@ -14,7 +14,8 @@ mavenPublishing {
     pom {
         val repoUrl = "github.com/epserv-ru/proxy-check-api"
 
-        name = "Kotlin/JVM implementation of proxycheck.io API spec"
+        name = project.name
+        description = project.description
         url = "https://$repoUrl"
         inceptionYear = "2026"
 
